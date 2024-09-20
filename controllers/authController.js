@@ -2,6 +2,11 @@ import { body, validationResult } from "express-validator";
 import bcrypt from "bcryptjs";
 
 import connectDB from "../config/db.js";
+import generateToken from "../utils/generateToken.js";
+import {
+  generateVerificationToken,
+  getVerificationTokenExpiration,
+} from "../utils/generateVerifyCode.js";
 
 const connection = await connectDB();
 
@@ -49,8 +54,12 @@ export const createUser = [
     const { name, email, phone, password, profile_picture } = req.body;
 
     try {
+      
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
+
+      const verificationToken = generateVerificationToken();
+      const verificationTokenExpiration = getVerificationTokenExpiration();
 
       const createUserQuery = `INSERT INTO users (name, email, phone, password, profile_picture, otp, role, date, status, otpExpiration, isVerified) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
@@ -62,11 +71,11 @@ export const createUser = [
           phone,
           hashedPassword,
           profile_picture,
-          0,
+          verificationToken,
           "admin",
           new Date(),
           2,
-          new Date(),
+          verificationTokenExpiration,
           "false",
         ],
         (err, result) => {
@@ -74,6 +83,9 @@ export const createUser = [
             console.error(err.message);
             return res.status(500).json({ message: "Internal server error" });
           }
+
+          const data = { name, role: "admin", status: 2 };
+          generateToken(data, res);
 
           return res.status(201).json({
             message: "Account created successfully",
@@ -130,6 +142,15 @@ export const loginUser = [
         }
 
         if (result[0].status == 2 || result[0].status == 1) {
+          const token = generateToken(
+            {
+              name: result[0].name,
+              role: result[0].role,
+              status: result[0].status,
+            },
+            res
+          );
+          console.log(token);
           if (result[0].isVerified === "true") {
             return res
               .status(200)
