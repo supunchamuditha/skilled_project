@@ -3,6 +3,12 @@ import bcrypt from "bcryptjs";
 import connectDB from "../config/db.js";
 import generateToken from "../utils/generateToken.js";
 import { createUserHelper } from "../helpers/userHelper.js";
+import {
+  generateVerificationToken,
+  getVerificationTokenExpiration,
+} from "../utils/generateVerifyCode.js";
+
+const connection = await connectDB();
 
 export const createUser_admin = async (req, res) => {
   return createUserHelper(req, res, "admin");
@@ -17,8 +23,6 @@ export const createUser_candidate = async (req, res) => {
 };
 
 export const loginUser = async (req, res) => {
-  const connection = await connectDB();
-
   const { email, password } = req.body;
 
   const checkAuthQuery = `SELECT * FROM users WHERE email = ?`;
@@ -62,4 +66,79 @@ export const loginUser = async (req, res) => {
     }
     return res.status(400).json({ message: "Invalid credentials" });
   });
+};
+
+export const verifyUser = async (req, res) => {
+  try {
+    const tokenEmail = req.tokenEmail;
+    const verificationCode = +req.body.verificationCode;
+
+    const currentTime = new Date();
+    const currentDate = new Date(currentTime.getTime());
+    currentDate.setMilliseconds(0);
+
+    const checkVerifyCodeQuery = `SELECT otp, otpExpiration  FROM users WHERE email = ?`;
+
+    connection.query(
+      checkVerifyCodeQuery,
+      [tokenEmail],
+      async (err, result) => {
+        if (err) {
+          console.error(err.message);
+          return res.status(500).json({ message: "Internal server error" });
+        }
+
+        if (
+          result.length !== 0 &&
+          result[0].otp === verificationCode &&
+          result[0].otpExpiration > currentDate
+        ) {
+          const updateUserQuery = `UPDATE users SET isVerified = "true" WHERE email = ?`;
+          connection.query(updateUserQuery, [tokenEmail], (err, result) => {
+            if (err) {
+              console.error(err.message);
+              return res.status(500).json({ message: "Internal server error" });
+            }
+
+            if (result.length !== 0) {
+              return res.status(200).json({ message: "User verified" });
+            }
+          });
+        } else {
+          return res.status(400).json({ message: "Invalid verification code" });
+        }
+      }
+    );
+  } catch (error) {
+    console.error("Error in verifyUser:", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const updateVerifyCode = async (req, res) => {
+  try {
+    const tokenEmail = req.tokenEmail;
+    const verificationToken = generateVerificationToken();
+    const verificationTokenExpiration = getVerificationTokenExpiration();
+
+    const updateVerifyCodeQuery = `UPDATE users SET otp = ?, otpExpiration = ? WHERE email = ?`;
+    connection.query(
+      updateVerifyCodeQuery,
+      [verificationToken, verificationTokenExpiration, tokenEmail],
+      async (err, result) => {
+        if (err) {
+          console.error(err.message);
+          return res.status(500).json({ message: "Internal server error" });
+        }
+
+        if (result.length !== 0) {
+          return res.status(200).json({ message: "Verification code sent" });
+        }
+        return res.status(400).json({ message: "Invalid credentials" });
+      }
+    );
+  } catch (error) {
+    console.error("Error in updateVerifyCode:", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };
