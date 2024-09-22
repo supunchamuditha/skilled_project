@@ -34,6 +34,7 @@ const authMiddleware = async (req, res, next) => {
           .json({ message: "Unauthorized - Invalid Token" });
       }
 
+      req.tokenEmail = email;
       next();
     });
   } catch (error) {
