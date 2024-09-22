@@ -17,12 +17,12 @@ const authMiddleware = async (req, res, next) => {
       return res.status(401).json({ message: "Unauthorized - Invalid Token" });
     }
 
-    const { name } = decoded;
+    const { email } = decoded;
 
     const connection = await connectDB();
-    const query = `SELECT name FROM users WHERE name = ?`;
+    const query = `SELECT email FROM users WHERE email = ?`;
 
-    connection.query(query, [name], (err, result) => {
+    connection.query(query, [email], (err, result) => {
       if (err) {
         console.error("Database query error:", err.message);
         return res.status(500).json({ message: "Internal server error" });

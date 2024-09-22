@@ -71,7 +71,7 @@ export const createUserHelper = async (req, res, role) => {
           return res.status(500).json({ message: "Internal server error" });
         }
 
-        const data = { name, role: "admin", status: 2 };
+        const data = { email, role: "admin", status: 2 };
         generateToken(data, res);
 
         return res.status(201).json({

@@ -42,7 +42,7 @@ export const loginUser = async (req, res) => {
       if (result[0].status == 2 || result[0].status == 1) {
         generateToken(
           {
-            name: result[0].name,
+            email: result[0].email,
             role: result[0].role,
             status: result[0].status,
           },
