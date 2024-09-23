@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import { validationResult } from "express-validator";
 
 import connectDB from "../config/db.js";
 import generateToken from "../utils/generateToken.js";
@@ -24,6 +25,16 @@ export const createUser_candidate = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
+
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res.status(400).json({
+      message: error
+        .array()
+        .map((error) => error.msg)
+        .join("||"),
+    });
+  }
 
   const checkAuthQuery = `SELECT * FROM users WHERE email = ?`;
 
