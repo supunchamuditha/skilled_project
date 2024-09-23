@@ -17,7 +17,7 @@ const authMiddleware = async (req, res, next) => {
       return res.status(401).json({ message: "Unauthorized - Invalid Token" });
     }
 
-    const { id } = decoded;
+    const { id, role, status } = decoded;
 
     const connection = await connectDB();
     const query = `SELECT id FROM users WHERE id = ?`;
@@ -35,6 +35,8 @@ const authMiddleware = async (req, res, next) => {
       }
 
       req.userid = id;
+      req.userrole = role;
+      req.userstatus = status;
       next();
     });
   } catch (error) {
