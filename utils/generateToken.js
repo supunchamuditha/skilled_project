@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 const generateToken = (data, res) => {
   // The payload should be an object
   const payload = {
-    email: data.email,
+    id: data.id,
     role: data.role,
     status: data.status,
   };

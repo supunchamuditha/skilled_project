@@ -46,7 +46,7 @@ export const loginUser = async (req, res) => {
       if (result[0].status == 2 || result[0].status == 1) {
         generateToken(
           {
-            email: result[0].email,
+            id: result[0].id,
             role: result[0].role,
             status: result[0].status,
           },
@@ -70,45 +70,41 @@ export const loginUser = async (req, res) => {
 
 export const verifyUser = async (req, res) => {
   try {
-    const tokenEmail = req.tokenEmail;
+    const userid = req.userid;
     const verificationCode = +req.body.verificationCode;
 
     const currentTime = new Date();
     const currentDate = new Date(currentTime.getTime());
     currentDate.setMilliseconds(0);
 
-    const checkVerifyCodeQuery = `SELECT otp, otpExpiration  FROM users WHERE email = ?`;
+    const checkVerifyCodeQuery = `SELECT otp, otpExpiration  FROM users WHERE id = ? AND isVerified = "false" AND status = 2`;
 
-    connection.query(
-      checkVerifyCodeQuery,
-      [tokenEmail],
-      async (err, result) => {
-        if (err) {
-          console.error(err.message);
-          return res.status(500).json({ message: "Internal server error" });
-        }
-
-        if (
-          result.length !== 0 &&
-          result[0].otp === verificationCode &&
-          result[0].otpExpiration > currentDate
-        ) {
-          const updateUserQuery = `UPDATE users SET isVerified = "true" WHERE email = ?`;
-          connection.query(updateUserQuery, [tokenEmail], (err, result) => {
-            if (err) {
-              console.error(err.message);
-              return res.status(500).json({ message: "Internal server error" });
-            }
-
-            if (result.length !== 0) {
-              return res.status(200).json({ message: "User verified" });
-            }
-          });
-        } else {
-          return res.status(400).json({ message: "Invalid verification code" });
-        }
+    connection.query(checkVerifyCodeQuery, [userid], async (err, result) => {
+      if (err) {
+        console.error(err.message);
+        return res.status(500).json({ message: "Internal server error" });
       }
-    );
+
+      if (
+        result.length !== 0 &&
+        result[0].otp === verificationCode &&
+        result[0].otpExpiration > currentDate
+      ) {
+        const updateUserQuery = `UPDATE users SET isVerified = "true", status = 1 WHERE id = ?`;
+        connection.query(updateUserQuery, [userid], (err, result) => {
+          if (err) {
+            console.error(err.message);
+            return res.status(500).json({ message: "Internal server error" });
+          }
+
+          if (result.length !== 0) {
+            return res.status(200).json({ message: "User verified" });
+          }
+        });
+      } else {
+        return res.status(400).json({ message: "Invalid verification code" });
+      }
+    });
   } catch (error) {
     console.error("Error in verifyUser:", error.message);
     return res.status(500).json({ message: "Internal server error" });
@@ -117,21 +113,21 @@ export const verifyUser = async (req, res) => {
 
 export const updateVerifyCode = async (req, res) => {
   try {
-    const tokenEmail = req.tokenEmail;
+    const userid = req.userid;
     const verificationToken = generateVerificationToken();
     const verificationTokenExpiration = getVerificationTokenExpiration();
 
-    const updateVerifyCodeQuery = `UPDATE users SET otp = ?, otpExpiration = ? WHERE email = ?`;
+    const updateVerifyCodeQuery = `UPDATE users SET otp = ?, otpExpiration = ? WHERE id = ? AND isVerified = "false" AND status = 2`;
     connection.query(
       updateVerifyCodeQuery,
-      [verificationToken, verificationTokenExpiration, tokenEmail],
+      [verificationToken, verificationTokenExpiration, userid],
       async (err, result) => {
         if (err) {
           console.error(err.message);
           return res.status(500).json({ message: "Internal server error" });
         }
 
-        if (result.length !== 0) {
+        if (result.affectedRows !== 0) {
           return res.status(200).json({ message: "Verification code sent" });
         }
         return res.status(400).json({ message: "Invalid credentials" });
