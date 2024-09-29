@@ -1,27 +1,10 @@
-import express from "express";
 import dotenv from "dotenv";
-import cookieParser from "cookie-parser";
-
-import authRouter from "./routes/authRoutes.js";
-import companyRouter from "./routes/companyRoutes.js";
+import app from "./app.js";
 
 dotenv.config();
 
-const PORT = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 
-const app = express();
-
-app.use(express.json());
-app.use(cookieParser());
-
-//Test the API
-app.get("/", (req, res) => {
-  res.send("root");
-});
-
-app.use("/api/auth", authRouter);
-app.use("/api/company", companyRouter);
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
