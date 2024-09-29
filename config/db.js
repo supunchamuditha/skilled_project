@@ -10,6 +10,9 @@ const connectDB = async () => {
         user: process.env.DB_USER,
         password: process.env.DB_PASS,
         database: process.env.DB_NAME,
+        waitForConnections: true,
+        connectionLimit: 10,
+        queueLimit: 0,
     });
 
     console.log(`Connected to the database`);
