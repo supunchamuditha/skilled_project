@@ -1,11 +1,9 @@
 import jwt from "jsonwebtoken";
 
 const generateToken = (data, res) => {
-  // The payload should be an object
   const payload = {
     id: data.id,
-    role: data.role,
-    status: data.status,
+    userType: data.userType,
   };
 
   const token = jwt.sign(payload, process.env.JWT_SECRET, {
@@ -13,10 +11,12 @@ const generateToken = (data, res) => {
   });
 
   res.cookie("token", token, {
-    maxAge: 5 * 24 * 60 * 60 * 1000,
     httpOnly: true,
+    secure: true,
+    maxAge: 2 * 60 * 1000, // 2 minutes
+    // maxAge: 5 * 24 * 60 * 60 * 1000, // 5 days
     sameSite: "strict",
-    secure: process.env.NODE_ENV !== "development",
+    secure: process.env.NODE_ENV === "development",
   });
 
   return token;
