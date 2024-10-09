@@ -1,75 +1,68 @@
 import { body } from "express-validator";
 
-export const userRegValidation = [
+export const userValidation = [
   body("full_name")
     .isString()
     .withMessage("Full name must be a string")
-    .isLength({ min: 3, max: 100 })
-    .withMessage("Full name must be between 3 and 100 characters"),
+    .isLength({ min: 3 })
+    .withMessage("Full name must be at least 3 characters long")
+    .matches(/^[A-Za-z\s]+$/)
+    .withMessage("Full name must only contain letters and spaces"),
 
   body("email")
     .isEmail()
-    .withMessage("Invalid email format")
-    .isLength({ max: 100 })
-    .withMessage("Email must be at most 100 characters"),
+    .withMessage("Please enter a valid email")
+    .isLength({ min: 3, max: 100 })
+    .withMessage("Email must be between 3 and 100 characters long"),
 
   body("phone_num")
-    .isMobilePhone()
-    .withMessage("Invalid phone number")
-    .isLength({ max: 15 })
-    .withMessage("Phone number must be at most 15 characters"),
+    .isLength({ min: 10, max: 15 })
+    .withMessage("Phone number must be between 10 and 15 characters long")
+    .custom((value) => {
+      const telPattern = /^\+?[0-9]{10,15}$/;
+
+      if (!telPattern.test(value)) {
+        throw new Error(
+          "Phone number must be a valid telephone number (e.g., +94112345678)."
+        );
+      }
+      return true;
+    })
+    .withMessage("Phone number must be a valid telephone number"),
 
   body("location")
     .isString()
     .withMessage("Location must be a string")
-    .isLength({ max: 100 })
-    .withMessage("Location must be at most 100 characters"),
+    .isLength({ min: 3 })
+    .withMessage("Location must be at least 3 characters long"),
 
   body("gender")
-    .isIn(["Male", "Female", "Other"])
-    .withMessage("Gender must be either Male, Female, or Other"),
+    .isIn(["Male", "Female"])
+    .withMessage("Gender must be either Male or Female"),
 
-  body("cv").custom((value, { req }) => {
-    if (!value) {
-      return true; // If CV is empty, that's allowed
-    }
-    // Check if it's a PDF file (you can improve this with more checks if needed)
-    if (req.body.cv.mimetype !== "application/pdf") {
-      throw new Error("CV must be a PDF file");
-    }
-    return true;
-  }),
+  body("profile_pic")
+    .isURL()
+    .withMessage("Profile picture must be a valid URL")
+    .matches(/\.(png|jpg|jpeg|gif)$/)
+    .withMessage("Profile picture must be a valid image (png, jpg, jpeg, gif)"),
 
-  body("profile_pic").custom((value, { req }) => {
-    if (!value) {
-      return true; // If profile picture is empty, that's allowed
-    }
-    // Check if it's a valid image format (JPEG, PNG, etc.)
-    if (
-      !["image/jpeg", "image/png", "image/gif"].includes(
-        req.body.profile_pic.mimetype
-      )
-    ) {
-      throw new Error(
-        "Profile picture must be a valid image format (JPEG, PNG, GIF)"
-      );
-    }
-    return true;
-  }),
+  body("profile_pic")
+    .isURL()
+    .withMessage("Profile picture must be a valid URL")
+    .matches(/\.(png|jpg|jpeg|gif)$/)
+    .withMessage("Profile picture must be a valid image (png, jpg, jpeg, gif)"),
 
   body("password")
     .isLength({ min: 8 })
-    .withMessage("Password must be at least 8 characters long"),
+    .withMessage("Password must be at least 8 characters long")
+    .matches(/[a-z]/)
+    .withMessage("Password must contain at least one lowercase letter (a-z)")
+    .matches(/[0-9]/)
+    .withMessage("Password must contain at least one number (0-9)")
+    .matches(/[!@#$%^&*(),.?":{}|<>]/)
+    .withMessage(
+      "Password must contain at least one special character (e.g., !, @, #, $)"
+    ),
 ];
 
-export const userLoginValidation = [
-  body("email")
-    .isEmail()
-    .withMessage("Invalid email format")
-    .isLength({ max: 100 })
-    .withMessage("Email must be at most 100 characters"),
 
-  body("password")
-    .isLength({ min: 8 })
-    .withMessage("Password must be at least 8 characters long"),
-];
