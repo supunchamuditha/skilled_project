@@ -1,10 +1,25 @@
+import express from "express";
 import dotenv from "dotenv";
-import app from "./app.js";
+
+import authRouter from "./routers/authRouter.js";
 
 dotenv.config();
 
-const port = process.env.PORT || 5000;
+const app = express();
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+app.use(express.json());
+
+const IP = process.env.IP || "localhost";
+const PORT = process.env.PORT || 5000;
+
+//test API
+app.get("/api", (req, res) => {
+  res.send("API is working");
+});
+
+//Auth route
+app.use("/api/auth", authRouter);
+
+app.listen(PORT, IP, () => {
+  console.log(`Server is running on IP ${IP} & port ${PORT}`);
 });
