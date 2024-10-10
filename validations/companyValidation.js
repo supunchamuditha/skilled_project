@@ -1,17 +1,19 @@
 import { body } from "express-validator";
 
 export const companyValidation = [
-  body("id").isInt().withMessage("ID must be an integer"),
-
   body("name")
     .isString()
-    .withMessage("Company name must be a string")
+    .withMessage("Name must be a string")
     .isLength({ min: 3 })
-    .withMessage("Company name must be at least 3 characters long"),
+    .withMessage("Name must be at least 3 characters long")
+    .matches(/^[A-Za-z0-9\s\-\_!@#\$%\^&*()+=]+$/)
+    .withMessage(
+      "Name can contain letters, numbers, spaces, and special characters such as - _ ! @ # $ % ^ & * ( ) + ="
+    ), // Allows letters, numbers, spaces, and specific symbols
 
   body("email")
     .isEmail()
-    .withMessage("Email must be a valid email address")
+    .withMessage("Please enter a valid email")
     .isLength({ min: 3, max: 100 })
     .withMessage("Email must be between 3 and 100 characters long"),
 
@@ -21,7 +23,7 @@ export const companyValidation = [
     .isLength({ min: 3 })
     .withMessage("Location must be at least 3 characters long"),
 
-  body("phone")
+  body("phone_num")
     .isLength({ min: 10, max: 15 })
     .withMessage("Phone number must be between 10 and 15 characters long")
     .custom((value) => {
@@ -45,7 +47,7 @@ export const companyValidation = [
   body("logo")
     .isURL()
     .withMessage("Logo must be a valid URL")
-    .matches(/\.(png|jpg|jpeg|gif)$/)
+    .matches(/\.(png|jpg|jpeg)$/)
     .withMessage("Logo must be a valid image (png, jpg, jpeg, gif)"),
 
   body("password")
@@ -59,10 +61,4 @@ export const companyValidation = [
     .withMessage(
       "Password must contain at least one special character (e.g., !, @, #, $)"
     ),
-
-  body("date").isISO8601().withMessage("Date must be a valid date"),
-
-  body("status")
-    .isIn(["Active", "Inactive"])
-    .withMessage("Status must be either 'Active' or 'Inactive'"),
 ];
