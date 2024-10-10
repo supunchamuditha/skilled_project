@@ -138,12 +138,11 @@ export const loginUser = async (req, res) => {
       if (isPasswordCorrect) {
         if (result[0].status === 1) {
           const data = {
-            id: result.insertId,
+            id: result[0].id,
             userType: "user",
           };
 
           generateToken(data, res);
-
           if (result[0].isVerified === "true") {
             res.status(200).send({ isVerified: result[0].isVerified });
           } else {
@@ -276,7 +275,7 @@ export const loginCompany = async (req, res) => {
       if (isPasswordCorrect) {
         if (result[0].status === 1) {
           const data = {
-            id: result.insertId,
+            id: result[0].id,
             userType: "user",
           };
 
