@@ -302,6 +302,20 @@ export const loginCompany = async (req, res) => {
 //verifyToken API
 export const verifyToken = async (req, res) => {
   try {
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      const err = error
+        .array()
+        .map((error) => error.msg)
+        .join(", ");
+
+      console.error("Error in loginCompany", err);
+
+      return res.status(400).json({
+        error: err,
+      });
+    }
+
     const userId = req.userId;
     const userType = req.userType;
     const { verificationCode } = req.body;

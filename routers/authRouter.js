@@ -8,7 +8,10 @@ import {
   verifyToken,
 } from "../controllers/authContoller.js";
 import { userValidation } from "../validations/userValidation.js";
-import { loginValidation } from "../validations/authValidation.js";
+import {
+  loginValidation,
+  tokenValidation,
+} from "../validations/authValidation.js";
 import { companyValidation } from "../validations/companyValidation.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
 
@@ -33,6 +36,6 @@ router.post("/registerCompany", companyValidation, registerCompany);
 router.post("/loginCompany", loginValidation, loginCompany);
 
 //verifyAccount API
-router.put("/verifyAccount", authMiddleware, verifyToken);
+router.put("/verifyAccount", tokenValidation, authMiddleware, verifyToken);
 
 export default router;
