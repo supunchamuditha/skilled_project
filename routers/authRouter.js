@@ -5,10 +5,12 @@ import {
   registerCompany,
   registerUser,
   testAPI,
+  verifyToken,
 } from "../controllers/authContoller.js";
 import { userValidation } from "../validations/userValidation.js";
 import { loginValidation } from "../validations/authValidation.js";
 import { companyValidation } from "../validations/companyValidation.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
@@ -29,5 +31,8 @@ router.post("/registerCompany", companyValidation, registerCompany);
 
 //companyLogin API
 router.post("/loginCompany", loginValidation, loginCompany);
+
+//verifyAccount API
+router.put("/verifyAccount", authMiddleware, verifyToken);
 
 export default router;

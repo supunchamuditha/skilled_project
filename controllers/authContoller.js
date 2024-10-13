@@ -222,7 +222,7 @@ export const registerCompany = async (req, res) => {
           userType: "company",
         };
 
-        // sendVerificationEmail(email, verificationCode);
+        sendVerificationEmail(email, verificationCode);
 
         generateToken(data, res);
 
@@ -300,7 +300,107 @@ export const loginCompany = async (req, res) => {
 };
 
 //verifyToken API
-export const verifyToken = async (req, res) => {};
+export const verifyToken = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const userType = req.userType;
+    const { verificationCode } = req.body;
+
+    console.log(userId, userType);
+    const currentTime = new Date();
+    const currentDate = new Date(currentTime.getTime());
+    currentDate.setMilliseconds(0);
+
+    const connect = await db();
+
+    if (userType === "user") {
+      const checkUserCode = `SELECT verificationCode, verificationExpiration, isVerified FROM users WHERE id = ? AND status = 1`;
+
+      connect.query(checkUserCode, [userId], (error, result) => {
+        if (error) {
+          console.error("Error in verifyToken for user", error.message);
+          return res.status(500).send({ message: "Internal server error" });
+        }
+
+        if (result.length === 0) {
+          return res.status(400).send({ message: "User does not exist" });
+        } else {
+          if (result[0].isVerified === "true") {
+            return res
+              .status(400)
+              .send({ message: "User is already verified" });
+          } else {
+            if (result[0].verificationExpiration < currentDate) {
+              return res.status(400).send({ message: "Token expired" });
+            } else if (result[0].verificationCode === verificationCode) {
+              const updateQuery = `UPDATE users SET isVerified = ? WHERE id = ?`;
+
+              connect.query(updateQuery, ["true", userId], (error, result) => {
+                if (error) {
+                  console.error("Error in verifying user", error.message);
+                  return res
+                    .status(500)
+                    .send({ message: "Internal server error" });
+                }
+
+                return res.status(200).send({ message: "User verified" });
+              });
+            } else {
+              return res
+                .status(400)
+                .send({ message: "Invalid verification code" });
+            }
+          }
+        }
+      });
+    } else if (userType === "company") {
+      const checkCompanyCode = `SELECT verificationCode, verificationExpiration, isVerified FROM companies WHERE id = ? AND status = 1`;
+
+      connect.query(checkCompanyCode, [userId], (error, result) => {
+        if (error) {
+          console.error("Error in verifyToken for company", error.message);
+          return res.status(500).send({ message: "Internal server error" });
+        }
+
+        if (result.length === 0) {
+          return res.status(400).send({ message: "Company does not exist" });
+        } else {
+          if (result[0].isVerified === "true") {
+            return res
+              .status(400)
+              .send({ message: "Company is already verified" });
+          } else {
+            if (result[0].verificationExpiration < currentDate) {
+              return res.status(400).send({ message: "Token expired" });
+            } else if (result[0].verificationCode === verificationCode) {
+              const updateQuery = `UPDATE companies SET isVerified = ? WHERE id = ?`;
+
+              connect.query(updateQuery, ["true", userId], (error, result) => {
+                if (error) {
+                  console.error("Error in verifying company", error.message);
+                  return res
+                    .status(500)
+                    .send({ message: "Internal server error" });
+                }
+
+                return res.status(200).send({ message: "Company verified" });
+              });
+            } else {
+              return res
+                .status(400)
+                .send({ message: "Invalid verification code" });
+            }
+          }
+        }
+      });
+    } else {
+      return res.status(400).send({ message: "Invalid user type" });
+    }
+  } catch (error) {
+    console.error("Error in verifyToken", error.message);
+    res.status(500).send({ message: "Internal server error" });
+  }
+};
 
 //resendVerificationToken API
 export const resendVerificationToken = async (req, res) => {};
