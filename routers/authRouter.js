@@ -4,6 +4,7 @@ import {
   loginUser,
   registerCompany,
   registerUser,
+  resendVerificationToken,
   testAPI,
   verifyToken,
 } from "../controllers/authContoller.js";
@@ -37,5 +38,8 @@ router.post("/loginCompany", loginValidation, loginCompany);
 
 //verifyAccount API
 router.put("/verifyAccount", tokenValidation, authMiddleware, verifyToken);
+
+//resendVerification API
+router.put("/resendVerification", authMiddleware, resendVerificationToken);
 
 export default router;

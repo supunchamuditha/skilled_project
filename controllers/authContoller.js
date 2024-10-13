@@ -417,7 +417,70 @@ export const verifyToken = async (req, res) => {
 };
 
 //resendVerificationToken API
-export const resendVerificationToken = async (req, res) => {};
+export const resendVerificationToken = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const userType = req.userType;
+
+    console.log(userId, userType);
+    const connect = await db();
+
+    const verificationCode = generateVerificationToken();
+    const date = getVerificationTokenExpiration();
+
+    if (!!userType) {
+      let userTypes = "";
+      if (userType === "user") {
+        userTypes = "users";
+      } else if (userType === "company") {
+        userTypes = "companies";
+      }
+
+      const getQuery = `SELECT email FROM ${userTypes} WHERE id = ? AND status = 1 AND isVerified = 'false'`;
+
+      connect.query(getQuery, [userId], (error, result) => {
+        if (error) {
+          console.error("Error in resendVerificationToken", error.message);
+          return res.status(500).send({ message: "Internal server error" });
+        }
+
+        if (result.length === 1) {
+          const updateQuery = `UPDATE ${userTypes} SET verificationCode = ?, verificationExpiration = ? WHERE id = ? AND status = 0 AND isVerified = false`;
+
+          connect.query(
+            updateQuery,
+            [verificationCode, date, userId],
+            (error) => {
+              if (error) {
+                console.error(
+                  "Error in resendVerificationToken",
+                  error.message
+                );
+                return res
+                  .status(500)
+                  .send({ message: "Internal server error" });
+              }
+
+              if (result.length === 1) {
+                sendVerificationEmail(result[0].email, verificationCode);
+                return res
+                  .status(200)
+                  .send({ message: "Verification code sent" });
+              }
+            }
+          );
+        } else {
+          return res.status(400).send({ message: "User does not exist" });
+        }
+      });
+    } else {
+      return res.status(400).send({ message: "Invalid user type" });
+    }
+  } catch (error) {
+    console.error("Error in resendVerificationToken", error.message);
+    return res.status(500).send({ message: "Internal server error" });
+  }
+};
 
 //forgotPassword API
 export const forgotPassword = async (req, res) => {};
