@@ -25,6 +25,6 @@ router.delete("/delete", authMiddleware, deleteUser);
 router.get("/:id", authMiddleware, getUser);
 
 // Get all users
-router.get("/all", authMiddleware, getUsers);
+router.get("/", authMiddleware, getUsers);
 
 export default router;

@@ -24,6 +24,6 @@ router.delete("/delete", authMiddleware, deleteCompany);
 router.get("/:id", authMiddleware, getCompany);
 
 // Get all companies
-router.get("/all", authMiddleware, getCompanies);
+router.get("/", authMiddleware, getCompanies);
 
 export default router;
