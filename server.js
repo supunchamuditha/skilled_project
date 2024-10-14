@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 
 import authRouter from "./routers/authRouter.js";
 import userRouter from "./routers/userRouter.js";
+import companyRouter from "./routers/companyRouter.js";
 
 dotenv.config();
 
@@ -25,6 +26,9 @@ app.use("/api/auth", authRouter);
 
 //User route
 app.use("/api/user", userRouter);
+
+//Company route
+app.use("/api/company", companyRouter);
 
 app.listen(PORT, IP, () => {
   console.log(`Server is running on IP ${IP} & port ${PORT}`);
