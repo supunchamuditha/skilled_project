@@ -2,6 +2,7 @@ import express from "express";
 import {
   loginCompany,
   loginUser,
+  logout,
   registerCompany,
   registerUser,
   resendVerificationToken,
@@ -41,5 +42,8 @@ router.put("/verifyAccount", tokenValidation, authMiddleware, verifyToken);
 
 //resendVerification API
 router.put("/resendVerification", authMiddleware, resendVerificationToken);
+
+//logout API
+router.get("/logout", authMiddleware, logout)
 
 export default router;
