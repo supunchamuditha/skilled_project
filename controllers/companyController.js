@@ -10,7 +10,7 @@ export const getCompany = async (req, res) => {
 
     const connect = await db();
 
-    const getCompanies = `SELECT name, email, phone_num, location, logo FROM companies WHERE id = ${id}`;
+    const getCompanies = `SELECT name, email, phone_num, location, industry, logo FROM companies WHERE id = ${id}`;
 
     connect.query(getCompanies, (err, result) => {
       if (err) {
@@ -30,8 +30,7 @@ export const getCompanies = async (req, res) => {
   try {
     const connect = await db();
 
-    const getCompanies =
-      "SELECT name, email, phone_num, location, logo FROM companies";
+    const getCompanies = `SELECT name, email, phone_num, location, industry, logo FROM companies`;
 
     connect.query(getCompanies, (err, result) => {
       if (err) {
