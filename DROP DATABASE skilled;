@@ -1,0 +1,70 @@
+DROP DATABASE skilled;
+
+-- 1. Create the 'skilled' database
+CREATE DATABASE IF NOT EXISTS skilled;
+USE skilled;
+
+-- 2. Create the 'user' table
+CREATE TABLE IF NOT EXISTS `users` (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    phone_num VARCHAR(20),
+    location VARCHAR(255),
+    gender ENUM('Male', 'Female', 'Other'),
+    cv VARCHAR(2083), -- URL length
+    profile_pic VARCHAR(2083), -- URL length
+    password VARCHAR(255) NOT NULL,
+    verificationCode VARCHAR(100),
+    verificationExpiration DATETIME,
+    isVerified VARCHAR(10),
+    date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status INT
+) ENGINE=InnoDB;
+
+-- 3. Create the 'companies' table
+CREATE TABLE IF NOT EXISTS `companies` (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    location VARCHAR(255),
+    phone_num VARCHAR(20),
+    industry VARCHAR(255),
+    logo VARCHAR(2083), -- URL length
+    password VARCHAR(255) NOT NULL,
+    verificationCode VARCHAR(100),
+    verificationExpiration DATETIME,
+    isVerified VARCHAR(10),
+    date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status INT
+) ENGINE=InnoDB;
+
+-- 4. Create the 'job' table
+CREATE TABLE IF NOT EXISTS `job` (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    location VARCHAR(255),
+    job_type ENUM('Full-Time', 'Part-Time', 'Contract', 'Internship', 'Temporary'),
+    position VARCHAR(255),
+    salary DECIMAL(15, 2),
+    date_posted DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status INT,
+    company_id INT,
+    FOREIGN KEY (company_id) REFERENCES `companies`(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- 5. Create the 'application' table
+CREATE TABLE IF NOT EXISTS `application` (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    message TEXT,
+    attachment VARCHAR(2083), -- URL length
+    user_id INT,
+    company_id INT,
+    job_id INT,
+    date_applied DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status INT,
+    FOREIGN KEY (user_id) REFERENCES `users`(id) ON DELETE CASCADE,
+    FOREIGN KEY (company_id) REFERENCES `companies`(id) ON DELETE CASCADE,
+    FOREIGN KEY (job_id) REFERENCES `job`(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
