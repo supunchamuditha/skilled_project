@@ -276,7 +276,7 @@ export const loginCompany = async (req, res) => {
         if (result[0].status === 1) {
           const data = {
             id: result[0].id,
-            userType: "user",
+            userType: "company",
           };
 
           generateToken(data, res);
