@@ -33,6 +33,7 @@ app.use("/api/user", userRouter);
 //Company route
 app.use("/api/company", companyRouter);
 
+//Post route
 app.use("/api/post", postRouter);
 
 app.listen(PORT, IP, () => {
