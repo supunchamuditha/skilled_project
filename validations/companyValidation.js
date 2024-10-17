@@ -44,11 +44,16 @@ export const companyValidation = [
     .isLength({ min: 2 })
     .withMessage("Industry must be at least 2 characters long"),
 
-  body("logo")
-    .isURL()
-    .withMessage("Logo must be a valid URL")
-    .matches(/\.(png|jpg|jpeg)$/)
-    .withMessage("Logo must be a valid image (png, jpg, jpeg, gif)"),
+  body("logo").custom((value, { req }) => {
+    if (!req.file) {
+      throw new Error("Logo is required");
+    }
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
+    if (!allowedTypes.includes(req.file.mimetype)) {
+      throw new Error("Logo must be a valid image (png, jpg, jpeg, gif)");
+    }
+    return true;
+  }),
 
   body("password")
     .isLength({ min: 8 })

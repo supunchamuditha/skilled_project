@@ -162,11 +162,12 @@ export const loginUser = async (req, res) => {
 };
 
 //registerCompany API
+// Register Company API
 export const registerCompany = async (req, res) => {
   try {
-    const error = validationResult(req);
-    if (!error.isEmpty()) {
-      const err = error
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const err = errors
         .array()
         .map((error) => error.msg)
         .join(", ");
@@ -177,8 +178,8 @@ export const registerCompany = async (req, res) => {
         error: err,
       });
     }
-    const { name, email, phone_num, location, industry, logo, password } =
-      req.body;
+
+    const { name, email, phone_num, location, industry, password } = req.body;
 
     const existsCompanyCheck = await existsCompany(email, res);
 
@@ -191,7 +192,11 @@ export const registerCompany = async (req, res) => {
     const verificationCode = generateVerificationToken();
     const isVerified = "false";
 
-    const companyQuery = `INSERT INTO companies (name, email, phone_num, location, industry, logo, password, verificationCode, verificationExpiration, isVerified, date, status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`;
+    // Get the logo file
+    const logo = req.file.buffer;
+    const logo_type = req.file.mimetype;
+
+    const companyQuery = `INSERT INTO companies (name, email, phone_num, location, industry, logo, logo_type, password, verificationCode, verificationExpiration, isVerified, date, status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`;
 
     const connect = await db();
 
@@ -204,6 +209,7 @@ export const registerCompany = async (req, res) => {
         location,
         industry,
         logo,
+        logo_type,
         hashedPassword,
         verificationCode,
         getVerificationTokenExpiration(),
@@ -214,7 +220,8 @@ export const registerCompany = async (req, res) => {
       (error, result) => {
         if (error) {
           console.error("Error in registerCompany", error.message);
-          res.status(500).send({ message: "Internal server error" });
+          return res.status(500).send({ message: "Internal server error" });
+          
         }
 
         const data = {
@@ -230,7 +237,7 @@ export const registerCompany = async (req, res) => {
       }
     );
   } catch (error) {
-    console.error("Error in registerComapnany", error.message);
+    console.error("Error in registerCompany", error.message);
     res.status(500).send({ message: "Internal server error" });
   }
 };

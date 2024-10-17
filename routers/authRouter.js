@@ -16,6 +16,7 @@ import {
 } from "../validations/authValidation.js";
 import { companyValidation } from "../validations/companyValidation.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
+import { uploadLogo } from "../controllers/imageController.js";
 
 const router = express.Router();
 
@@ -32,7 +33,7 @@ router.post("/registerUser", userValidation, registerUser);
 router.post("/loginUser", loginValidation, loginUser);
 
 //companyRegister API
-router.post("/registerCompany", companyValidation, registerCompany);
+router.post("/registerCompany", uploadLogo, companyValidation, registerCompany);
 
 //companyLogin API
 router.post("/loginCompany", loginValidation, loginCompany);
@@ -44,6 +45,6 @@ router.put("/verifyAccount", tokenValidation, authMiddleware, verifyToken);
 router.put("/resendVerification", authMiddleware, resendVerificationToken);
 
 //logout API
-router.get("/logout", authMiddleware, logout)
+router.get("/logout", authMiddleware, logout);
 
 export default router;
