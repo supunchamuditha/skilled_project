@@ -16,7 +16,10 @@ import {
 } from "../validations/authValidation.js";
 import { companyValidation } from "../validations/companyValidation.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
-import { uploadLogo } from "../controllers/imageController.js";
+import {
+  uploadLogo,
+  uploadProfile_pic,
+} from "../controllers/imageController.js";
 
 const router = express.Router();
 
@@ -27,7 +30,7 @@ router.get("/", (req, res) => {
 router.post("/testapi", testAPI);
 
 //registerUser API
-router.post("/registerUser", userValidation, registerUser);
+router.post("/registerUser", uploadProfile_pic, userValidation, registerUser);
 
 //loginUser API
 router.post("/loginUser", loginValidation, loginUser);

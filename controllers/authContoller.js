@@ -30,16 +30,8 @@ export const registerUser = async (req, res) => {
       error: err,
     });
   }
-  const {
-    full_name,
-    email,
-    phone_num,
-    location,
-    gender,
-    cv,
-    profile_pic,
-    password,
-  } = req.body;
+  const { full_name, email, phone_num, location, gender, cv, password } =
+    req.body;
 
   try {
     const existsUserCheck = await existsUser(email, res);
@@ -53,7 +45,10 @@ export const registerUser = async (req, res) => {
     const verificationCode = generateVerificationToken();
     const isVerified = "false";
 
-    const userQuery = `INSERT INTO users (full_name, email, phone_num, location, gender, cv, profile_pic, password, verificationCode, verificationExpiration, isVerified, date, status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+    const profile_pic = req.file.buffer;
+    const profile_pic_type = req.file.mimetype;
+
+    const userQuery = `INSERT INTO users (full_name, email, phone_num, location, gender,  profile_pic, profile_pic_type, password, verificationCode, verificationExpiration, isVerified, date, status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
 
     const connect = await db();
 
@@ -65,8 +60,8 @@ export const registerUser = async (req, res) => {
         phone_num,
         location,
         gender,
-        cv,
         profile_pic,
+        profile_pic_type,
         hashedPassword,
         verificationCode,
         getVerificationTokenExpiration(),
@@ -221,7 +216,6 @@ export const registerCompany = async (req, res) => {
         if (error) {
           console.error("Error in registerCompany", error.message);
           return res.status(500).send({ message: "Internal server error" });
-          
         }
 
         const data = {

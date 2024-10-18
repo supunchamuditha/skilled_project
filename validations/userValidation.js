@@ -40,17 +40,22 @@ export const userValidation = [
     .isIn(["Male", "Female"])
     .withMessage("Gender must be either Male or Female"),
 
-  body("profile_pic")
-    .isURL()
-    .withMessage("Profile picture must be a valid URL")
-    .matches(/\.(png|jpg|jpeg|gif)$/)
-    .withMessage("Profile picture must be a valid image (png, jpg, jpeg, gif)"),
-
-  body("profile_pic")
-    .isURL()
-    .withMessage("Profile picture must be a valid URL")
-    .matches(/\.(png|jpg|jpeg|gif)$/)
-    .withMessage("Profile picture must be a valid image (png, jpg, jpeg, gif)"),
+  body("profile_pic").custom((value, { req }) => {
+    if (!req.file) {
+      throw new Error("Logo is required");
+    }
+    const allowedTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+    ];
+    if (!allowedTypes.includes(req.file.mimetype)) {
+      throw new Error("Logo must be a valid image (png, jpg, jpeg, gif)");
+    }
+    return true;
+  }),
 
   body("password")
     .isLength({ min: 8 })
@@ -64,5 +69,3 @@ export const userValidation = [
       "Password must contain at least one special character (e.g., !, @, #, $)"
     ),
 ];
-
-
