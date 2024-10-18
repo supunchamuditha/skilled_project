@@ -48,7 +48,7 @@ export const registerUser = async (req, res) => {
     const profile_pic = req.file.buffer;
     const profile_pic_type = req.file.mimetype;
 
-    const userQuery = `INSERT INTO users (full_name, email, phone_num, location, gender,  profile_pic, profile_pic_type, password, verificationCode, verificationExpiration, isVerified, date, status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
+    const userQuery = `INSERT INTO users (full_name, email, phone_num, location, gender,  profile_pic, profile_pic_type, password, verificationCode, verificationExpiration, isVerified, date, status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`;
 
     const connect = await db();
 
@@ -156,7 +156,6 @@ export const loginUser = async (req, res) => {
   }
 };
 
-//registerCompany API
 // Register Company API
 export const registerCompany = async (req, res) => {
   try {
