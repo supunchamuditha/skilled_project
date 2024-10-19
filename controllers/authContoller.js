@@ -137,11 +137,7 @@ export const loginUser = async (req, res) => {
           };
 
           generateToken(data, res);
-          if (result[0].isVerified === "true") {
-            res.status(200).send({ isVerified: result[0].isVerified });
-          } else {
-            res.status(200).send({ isVerified: result[0].isVerified });
-          }
+          res.status(200).send({ isVerified: result[0].isVerified });
         } else {
           res.status(400).send({ message: "User is blocked" });
         }
@@ -290,11 +286,7 @@ export const loginCompany = async (req, res) => {
 
           generateToken(data, res);
 
-          if (result[0].isVerified === "true") {
-            res.status(200).send({ isVerified: result[0].isVerified });
-          } else {
-            res.status(200).send({ isVerified: result[0].isVerified });
-          }
+          res.status(200).send({ isVerified: result[0].isVerified });
         } else {
           res.status(400).send({ message: "Company is blocked" });
         }

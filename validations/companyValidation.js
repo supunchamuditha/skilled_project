@@ -60,7 +60,7 @@ export const companyValidation = [
     .withMessage("Password must be at least 8 characters long")
     .matches(/[a-z]/)
     .withMessage("Password must contain at least one lowercase letter (a-z)")
-    .matches(/[0-9]/)
+    .matches(/\d/)
     .withMessage("Password must contain at least one number (0-9)")
     .matches(/[!@#$%^&*(),.?":{}|<>]/)
     .withMessage(
