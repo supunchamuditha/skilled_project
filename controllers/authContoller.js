@@ -30,8 +30,7 @@ export const registerUser = async (req, res) => {
       error: err,
     });
   }
-  const { full_name, email, phone_num, location, gender, cv, password } =
-    req.body;
+  const { full_name, email, phone_num, location, gender, password } = req.body;
 
   try {
     const existsUserCheck = await existsUser(email, res);
@@ -173,6 +172,11 @@ export const registerCompany = async (req, res) => {
       });
     }
 
+    const isCaptchValid = await verifyCaptcha(req.body.captchaToken);
+    if (isCaptchValid) {
+      return res.status(400).send({ message: "Invalid captcha" });
+    }
+
     const { name, email, phone_num, location, industry, password } = req.body;
 
     const existsCompanyCheck = await existsCompany(email, res);
@@ -253,6 +257,11 @@ export const loginCompany = async (req, res) => {
     }
     const { email, password } = req.body;
 
+    const isCaptchValid = await verifyCaptcha(req.body.captchaToken);
+    if (isCaptchValid) {
+      return res.status(400).send({ message: "Invalid captcha" });
+    }
+
     const connect = await db();
 
     const checkUserQuery = `SELECT * FROM companies WHERE email = ?`;
@@ -320,7 +329,6 @@ export const verifyToken = async (req, res) => {
     const userType = req.userType;
     const { verificationCode } = req.body;
 
-    console.log(userId, userType);
     const currentTime = new Date();
     const currentDate = new Date(currentTime.getTime());
     currentDate.setMilliseconds(0);
@@ -422,7 +430,6 @@ export const resendVerificationToken = async (req, res) => {
     const userId = req.userId;
     const userType = req.userType;
 
-    console.log(userId, userType);
     const connect = await db();
 
     const verificationCode = generateVerificationToken();
@@ -445,12 +452,12 @@ export const resendVerificationToken = async (req, res) => {
         }
 
         if (result.length === 1) {
-          const updateQuery = `UPDATE ${userTypes} SET verificationCode = ?, verificationExpiration = ? WHERE id = ? AND status = 0 AND isVerified = false`;
+          const updateQuery = `UPDATE ${userTypes} SET verificationCode = ?, verificationExpiration = ? WHERE id = ? AND status != 0 AND isVerified = false`;
 
           connect.query(
             updateQuery,
             [verificationCode, date, userId],
-            (error) => {
+            (error, resultq) => {
               if (error) {
                 console.error(
                   "Error in resendVerificationToken",
@@ -461,11 +468,15 @@ export const resendVerificationToken = async (req, res) => {
                   .send({ message: "Internal server error" });
               }
 
-              if (result.length === 1) {
+              if (resultq.changedRows === 1) {
                 sendVerificationEmail(result[0].email, verificationCode);
                 return res
                   .status(200)
                   .send({ message: "Verification code sent" });
+              } else {
+                return res
+                  .status(400)
+                  .send({ message: "Internal server error. " });
               }
             }
           );
