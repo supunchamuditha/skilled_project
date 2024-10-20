@@ -2,6 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from 'url';
 
 import logger from "./logger.js";
 
@@ -34,6 +36,18 @@ app.use(cookieParser());
 
 const IP = process.env.IP || "localhost";
 const PORT = process.env.PORT || 5000;
+
+// Get the directory name
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use(express.static(path.join(__dirname, "/Skilled_frontend-master/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(
+    path.join(__dirname, "Skilled_frontend-master", "dist", "index.html")
+  );
+});
 
 //test API
 app.get("/api", (req, res) => {
