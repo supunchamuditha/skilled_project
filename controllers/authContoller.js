@@ -101,13 +101,18 @@ export const loginUser = async (req, res) => {
       .map((error) => error.msg)
       .join(", ");
 
-    console.error("Error in registerUser", err);
+    console.error("Error in loginUser", err);
 
     return res.status(400).json({
       error: err,
     });
   }
   const { email, password } = req.body;
+
+  const isCaptchValid = await verifyCaptcha(req.body.captchaToken);
+  if (isCaptchValid) {
+    return res.status(400).send({ message: "Invalid captcha" });
+  }
 
   try {
     const connect = await db();
