@@ -9,6 +9,7 @@ import {
 import generateToken from "../utils/generateToken.js";
 import { comparePassword, hashPassword } from "../utils/hashPassword.js";
 import { sendVerificationEmail } from "../utils/sendEmail.js";
+import { verifyCaptcha } from "../utils/verifyCaptcha.js";
 
 //test API
 export const testAPI = (req, res) => {
@@ -107,9 +108,9 @@ export const loginUser = async (req, res) => {
       error: err,
     });
   }
-  const { email, password } = req.body;
+  const { email, password, captchaToken } = req.body;
 
-  const isCaptchValid = await verifyCaptcha(req.body.captchaToken);
+  const isCaptchValid = await verifyCaptcha(captchaToken);
   if (isCaptchValid) {
     return res.status(400).send({ message: "Invalid captcha" });
   }
