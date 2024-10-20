@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
+import logger from "./logger.js";
+
 import authRouter from "./routers/authRouter.js";
 import userRouter from "./routers/userRouter.js";
 import companyRouter from "./routers/companyRouter.js";
@@ -13,7 +15,20 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+app.use((req, res, next) => {
+  const logMessage = `Method: ${req.method}, URL: ${req.url}, Status: ${res.statusCode}, IP: ${req.ip}`;
+  logger.info(logMessage);
+  next();
+});
+
+app.use(
+  cors({
+    origin: "http://localhost:5000/", // This must match your frontend origin
+    credentials: true, // Allow credentials (cookies, tokens)
+    methods: "GET,POST,PUT,DELETE", // Add the HTTP methods that your API allows
+    // allowedHeaders: 'Content-Type, Authorization' // Add the headers that your API accepts
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 
@@ -40,6 +55,12 @@ app.use("/api/post", postRouter);
 //application route
 app.use("/api/application", applicationRouter);
 
+app.use((err, req, res, next) => {
+  logger.error(`Error: ${err.message}`);
+  res.status(500).send("Internal Server Error");
+});
+
 app.listen(PORT, IP, () => {
+  logger.info(`Server is running on IP ${IP} & port ${PORT}`);
   console.log(`Server is running on IP ${IP} & port ${PORT}`);
 });
