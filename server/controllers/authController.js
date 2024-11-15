@@ -2,6 +2,7 @@ import { where } from "sequelize";
 import { validationResult } from "express-validator";
 import User from "../models/User.js";
 import { hashPassword } from "../utils/hashPassword.js";
+import generateToken from "../utils/generateToken.js";
 
 // Register a new user
 export const registerUser = async (req, res) => {
@@ -25,7 +26,7 @@ export const registerUser = async (req, res) => {
         errors: groupedErrors,
       });
     }
-    
+
     const { full_name, email, password, phone_num, location, gender } =
       req.body;
 
@@ -62,7 +63,10 @@ export const registerUser = async (req, res) => {
 
     //Remove the password field from the user object before sending
     const userResponse = { ...newuser.toJSON() };
-    delete userResponse.password;
+    delete userResponse.password, delete userResponse.cv, delete userResponse.profile_pic;
+
+    const data = { id: userResponse.id };
+    generateToken(data, res);
 
     return res
       .status(201)
