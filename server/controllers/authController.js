@@ -1,5 +1,6 @@
 import { where } from "sequelize";
 import User from "../models/User.js";
+import { hashPassword } from "../utils/hashPassword.js";
 
 // Register a new user
 export const registerUser = async (req, res) => {
@@ -21,11 +22,14 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
+    //hash the password
+    const hashedPassword = await hashPassword(password);
+
     // Create a new user
     const newuser = await User.create({
       full_name,
       email,
-      password,
+      password: hashedPassword,
       phone_num,
       location,
       gender,
