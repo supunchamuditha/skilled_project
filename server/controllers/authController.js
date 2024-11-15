@@ -1,10 +1,31 @@
 import { where } from "sequelize";
+import { validationResult } from "express-validator";
 import User from "../models/User.js";
 import { hashPassword } from "../utils/hashPassword.js";
 
 // Register a new user
 export const registerUser = async (req, res) => {
   try {
+    // Validate request
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      // Group errors by field
+      const groupedErrors = errors.array().reduce((acc, error) => {
+        const param = error.path || "unknown";
+        if (!acc[param]) {
+          acc[param] = [];
+        }
+        acc[param].push(error.msg);
+        return acc;
+      }, {});
+
+      return res.status(400).json({
+        success: false,
+        message: "Validation errors",
+        errors: groupedErrors,
+      });
+    }
+    
     const { full_name, email, password, phone_num, location, gender } =
       req.body;
 
