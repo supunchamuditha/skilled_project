@@ -1,8 +1,15 @@
 import { where } from "sequelize";
 import { validationResult } from "express-validator";
+
 import User from "../models/User.js";
 import { hashPassword } from "../utils/hashPassword.js";
 import generateToken from "../utils/generateToken.js";
+import generateOTP from "../utils/generateOTP.js";
+import sendOTP from "../utils/sendOTP.js";
+import { sendVerificationEmail } from "../utils/sendEmail.js";
+
+// Store OTPs in memory
+const otpStore = {};
 
 // Register a new user
 export const registerUser = async (req, res) => {
@@ -39,11 +46,26 @@ export const registerUser = async (req, res) => {
     //hash the password
     const hashedPassword = await hashPassword(password);
 
+    // Access uploaded profile picture
     const profilePic = req.files["profile_pic"][0].buffer; // Access uploaded profile picture
     const profilePicType = req.files["profile_pic"][0].mimetype;
 
+    // Access uploaded CV
     const cv = req.files["cv"][0].buffer; // Access uploaded CV
     const cvType = req.files["cv"][0].mimetype;
+
+    // Generate OTP
+    const otp = generateOTP();
+    const otpExpiry = 300;
+
+    // Store the OTP in memory
+    otpStore[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 };
+
+    // Send OTP SMS to the user
+    await sendOTP(phone_num, otp);
+
+    // Send OTP email to the user
+    sendVerificationEmail(email, otp);
 
     // Create a new user
     const newuser = await User.create({
@@ -63,7 +85,7 @@ export const registerUser = async (req, res) => {
 
     //Remove the password field from the user object before sending
     const userResponse = { ...newuser.toJSON() };
-    delete userResponse.password, delete userResponse.cv, delete userResponse.profile_pic;
+    delete userResponse.password;
 
     const data = { id: userResponse.id };
     generateToken(data, res);
