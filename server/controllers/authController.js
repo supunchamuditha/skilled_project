@@ -5,16 +5,8 @@ import { hashPassword } from "../utils/hashPassword.js";
 // Register a new user
 export const registerUser = async (req, res) => {
   try {
-    const {
-      full_name,
-      email,
-      password,
-      phone_num,
-      location,
-      gender,
-      cv,
-      profile_pic,
-    } = req.body;
+    const { full_name, email, password, phone_num, location, gender } =
+      req.body;
 
     // Check if the user already exists
     const existingUser = await User.findOne({ where: { email } });
@@ -25,6 +17,12 @@ export const registerUser = async (req, res) => {
     //hash the password
     const hashedPassword = await hashPassword(password);
 
+    const profilePic = req.files["profile_pic"][0].buffer; // Access uploaded profile picture
+    const profilePicType = req.files["profile_pic"][0].mimetype;
+
+    const cv = req.files["cv"][0].buffer; // Access uploaded CV
+    const cvType = req.files["cv"][0].mimetype;
+
     // Create a new user
     const newuser = await User.create({
       full_name,
@@ -33,10 +31,10 @@ export const registerUser = async (req, res) => {
       phone_num,
       location,
       gender,
-      cv: "",
-      cv_type: "",
-      profile_pic: "",
-      profile_pic_type: "",
+      cv: cv,
+      cv_type: cvType,
+      profile_pic: profilePic,
+      profile_pic_type: profilePicType,
       isVerified: "false",
       status: 1,
     });
