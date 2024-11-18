@@ -2,6 +2,7 @@ import { where } from "sequelize";
 import { validationResult } from "express-validator";
 
 import User from "../models/User.js";
+import Company from "../models/Company.js";
 import { hashPassword } from "../utils/hashPassword.js";
 import generateToken from "../utils/generateToken.js";
 import generateOTP from "../utils/generateOTP.js";
@@ -93,6 +94,41 @@ export const registerUser = async (req, res) => {
     return res
       .status(201)
       .json({ message: "User created successfully", user: userResponse });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Register a new company
+export const registerCompany = async (req, res) => {
+  try {
+    //Extract company details from request body
+    const { name, email, phone_num, location, industry, password } = req.body;
+
+    // Create a new company
+    const newCompany = await Company.create({
+      name,
+      email,
+      location,
+      phone_num,
+      industry,
+      logo: "",
+      logo_type: "",
+      password,
+      isVerified: "false",
+      status: 1,
+    });
+
+    // Remove the password field from the company object before sending
+    const companyResponse = { ...newCompany.toJSON() };
+    delete companyResponse.password;
+
+    // Return the company object
+    return res.status(201).json({
+      message: "Company created successfully",
+      company: companyResponse,
+    });
   } catch (error) {
     console.error(error.message);
     return res.status(500).json({ message: "Internal server error" });
