@@ -58,7 +58,6 @@ export const registerUser = async (req, res) => {
 
     // Generate OTP
     const otp = generateOTP();
-    const otpExpiry = 300;
 
     // Store the OTP in memory
     otpStore[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 };
