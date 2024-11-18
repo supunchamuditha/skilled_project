@@ -122,6 +122,18 @@ export const registerCompany = async (req, res) => {
     const logo = req.file.buffer;
     const logoType = req.file.mimetype;
 
+    // Generate OTP
+    const otp = generateOTP();
+
+    // Store the OTP in memory
+    otpStore[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 };
+
+    // Send OTP SMS to the company
+    await sendOTP(phone_num, otp);
+
+    // Send OTP email to the company
+    sendVerificationEmail(email, otp);
+
     // Create a new company
     const newCompany = await Company.create({
       name,
