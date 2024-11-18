@@ -109,6 +109,12 @@ export const registerCompany = async (req, res) => {
     //Extract company details from request body
     const { name, email, phone_num, location, industry, password } = req.body;
 
+    // Check if the company already exists
+    const existingCompany = await Company.findOne({ where: { email } });
+    if (existingCompany) {
+      return res.status(400).json({ message: "Company already exists" });
+    }
+
     // Create a new company
     const newCompany = await Company.create({
       name,
