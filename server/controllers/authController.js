@@ -35,6 +35,7 @@ export const registerUser = async (req, res) => {
       });
     }
 
+    // Extract user details from request body
     const { full_name, email, password, phone_num, location, gender } =
       req.body;
 
@@ -88,9 +89,11 @@ export const registerUser = async (req, res) => {
     const userResponse = { ...newuser.toJSON() };
     delete userResponse.password;
 
+    // Generate a token for the user
     const data = { id: userResponse.id };
     generateToken(data, res);
 
+    // Return the user object
     return res
       .status(201)
       .json({ message: "User created successfully", user: userResponse });
