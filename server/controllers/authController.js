@@ -115,6 +115,9 @@ export const registerCompany = async (req, res) => {
       return res.status(400).json({ message: "Company already exists" });
     }
 
+    // Hash the password
+    const hashedPassword = await hashPassword(password);
+
     // Access uploaded logo
     const logo = req.file.buffer;
     const logoType = req.file.mimetype;
@@ -128,7 +131,7 @@ export const registerCompany = async (req, res) => {
       industry,
       logo: logo,
       logo_type: logoType,
-      password,
+      password: hashedPassword,
       isVerified: "false",
       status: 1,
     });
