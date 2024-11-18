@@ -115,6 +115,10 @@ export const registerCompany = async (req, res) => {
       return res.status(400).json({ message: "Company already exists" });
     }
 
+    // Access uploaded logo
+    const logo = req.file.buffer;
+    const logoType = req.file.mimetype;
+
     // Create a new company
     const newCompany = await Company.create({
       name,
@@ -122,8 +126,8 @@ export const registerCompany = async (req, res) => {
       location,
       phone_num,
       industry,
-      logo: "",
-      logo_type: "",
+      logo: logo,
+      logo_type: logoType,
       password,
       isVerified: "false",
       status: 1,

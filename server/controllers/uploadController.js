@@ -12,3 +12,6 @@ export const uploadPPCV = upload.fields([
   { name: "profile_pic", maxCount: 1 },
   { name: "cv", maxCount: 1 },
 ]);
+
+// Upload company logo
+export const uploadLogo = upload.single('logo'); 
