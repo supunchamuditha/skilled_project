@@ -171,6 +171,10 @@ export const registerCompany = async (req, res) => {
     const companyResponse = { ...newCompany.toJSON() };
     delete companyResponse.password;
 
+    // Generate a token for the company
+    const data = { id: companyResponse.id };
+    generateToken(data, res);
+
     // Return the company object
     return res.status(201).json({
       message: "Company created successfully",
