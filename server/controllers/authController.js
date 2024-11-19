@@ -105,6 +105,26 @@ export const registerUser = async (req, res) => {
 // Register a new company
 export const registerCompany = async (req, res) => {
   try {
+    // Validate request
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      // Group errors by field
+      const groupedErrors = errors.array().reduce((acc, error) => {
+        const param = error.path || "unknown";
+        if (!acc[param]) {
+          acc[param] = [];
+        }
+        acc[param].push(error.msg);
+        return acc;
+      }, {});
+
+      return res.status(400).json({
+        success: false,
+        message: "Validation errors",
+        errors: groupedErrors,
+      });
+    }
+
     //Extract company details from request body
     const { name, email, phone_num, location, industry, password } = req.body;
 

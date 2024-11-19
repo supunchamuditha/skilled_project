@@ -5,6 +5,7 @@ import {
 } from "../controllers/authController.js";
 import { uploadLogo, uploadPPCV } from "../controllers/uploadController.js";
 import { userValidation } from "../validation/userValidation.js";
+import { companyValidation } from "../validation/companyValidation.js";
 
 const router = express.Router();
 
@@ -12,6 +13,6 @@ const router = express.Router();
 router.post("/user", uploadPPCV, userValidation, registerUser);
 
 // Register a new company
-router.post("/company", uploadLogo, registerCompany);
+router.post("/company", uploadLogo, companyValidation, registerCompany);
 
 export default router;
