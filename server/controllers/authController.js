@@ -3,7 +3,7 @@ import { validationResult } from "express-validator";
 
 import User from "../models/User.js";
 import Company from "../models/Company.js";
-import { hashPassword } from "../utils/hashPassword.js";
+import { hashPassword, comparePassword } from "../utils/hashPassword.js";
 import generateToken from "../utils/generateToken.js";
 import generateOTP from "../utils/generateOTP.js";
 import sendOTP from "../utils/sendOTP.js";
@@ -180,6 +180,67 @@ export const registerCompany = async (req, res) => {
       message: "Company created successfully",
       company: companyResponse,
     });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Login a user
+export const loginUser = async (req, res) => {
+  try {
+    // Validate request
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const groupedErrors = errors.array().reduce((acc, errors) => {
+        const param = errors.path || "unknown";
+        if (!acc[param]) {
+          acc[param] = [];
+        }
+        acc[param].push(errors.msg);
+        return acc;
+      }, {});
+
+      return res.status(400).json({
+        success: false,
+        message: "Validation errors",
+        errors: groupedErrors,
+      });
+    }
+
+    console.log(req.body);
+    // Extract user details from request body
+    const { email, password } = req.body;
+
+    // Check if the user exists
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    let message = "Account verified, login successful";
+
+    // Check if the user's account is verified
+    if (user.isVerified === "false") {
+      message = "Account not verified";
+    }
+
+    // Compare the password
+    const isMatch = await comparePassword(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    // Generate a token for the user
+    const data = { id: user.id };
+    generateToken(data, res);
+
+    // Remove the password field from the user object before sending
+    const userResponse = { ...user.toJSON() };
+    delete userResponse.password;
+
+    // Return the user object
+    return res.status(200).json({ message, user: userResponse });
   } catch (error) {
     console.error(error.message);
     return res.status(500).json({ message: "Internal server error" });
