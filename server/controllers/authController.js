@@ -1,8 +1,8 @@
 import { where } from "sequelize";
 import { validationResult } from "express-validator";
 
-import User from "../models/User.js";
-import Company from "../models/Company.js";
+import {User, Company} from "../models/index.js";
+// import Company from "../models/Company.js";
 import { hashPassword, comparePassword } from "../utils/hashPassword.js";
 import generateToken from "../utils/generateToken.js";
 import generateOTP from "../utils/generateOTP.js";
@@ -208,7 +208,6 @@ export const loginUser = async (req, res) => {
       });
     }
 
-    console.log(req.body);
     // Extract user details from request body
     const { email, password } = req.body;
 
@@ -241,6 +240,66 @@ export const loginUser = async (req, res) => {
 
     // Return the user object
     return res.status(200).json({ message, user: userResponse });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Login a company
+export const companyLogin = async (req, res) => {
+  try {
+    // Validate request
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const groupedErrors = errors.array().reduce((acc, error) => {
+        const param = error.path || "unknown";
+        if (!acc[param]) {
+          acc[param] = [];
+        }
+        acc[param].push(error.msg);
+        return acc;
+      }, {});
+
+      return res.status(400).json({
+        success: false,
+        message: "Validation errors",
+        errors: groupedErrors,
+      });
+    }
+
+    // Extract company details from request body
+    const { email, password } = req.body;
+
+    // Check if the company exists
+    const company = await Company.findOne({ where: { email } });
+    if (!company) {
+      return res.status(404).json({ message: "Company not found" });
+    }
+
+    let message = "Account verified, login successful";
+
+    // Check if the company's account is verified
+    if (company.isVerified === "false") {
+      message = "Account not verified";
+    }
+
+    // Compare the password
+    const isMatch = await comparePassword(password, company.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    // Generate a token for the company
+    const data = { id: company.id };
+    generateToken(data, res);
+
+    // Remove the password field from the company object before sending
+    const companyResponse = { ...company.toJSON() };
+    delete companyResponse.password;
+
+    // Return the company object
+    return res.status(200).json({ message, company: companyResponse });
   } catch (error) {
     console.error(error.message);
     return res.status(500).json({ message: "Internal server error" });

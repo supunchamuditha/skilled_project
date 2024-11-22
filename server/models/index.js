@@ -1,4 +1,4 @@
-import sequelize from '../config/database.js';
+import sequelize from '../config/db.js';
 import User from './User.js';
 import Company from './Company.js';
 import Job from './Job.js';

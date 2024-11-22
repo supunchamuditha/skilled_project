@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  companyLogin,
   loginUser,
   registerCompany,
   registerUser,
@@ -19,5 +20,8 @@ router.post("/company", uploadLogo, companyValidation, registerCompany);
 
 // Login a user
 router.post("/user/login", loginValidation, loginUser);
+
+// Login a company
+router.post("/company/login", loginValidation, companyLogin);
 
 export default router;
