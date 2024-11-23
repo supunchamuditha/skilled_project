@@ -155,6 +155,7 @@
          }
          ```
    - Company
+
      - **Endpoint:**
        `POST /api/auth/company`
      - **Headers:**
@@ -170,6 +171,91 @@
         "industry": "Technology",
         "password": "SecureP@ssw0rd",
         "logo": "logo.jpg"
+       }
+       ```
+
+     - **Response:**
+       - **Success**(`200 OK`):
+         ```bash
+         {
+          "message": "Company created successfully",
+          "company":{
+            "date": "2024-11-23T16:31:12.125Z",
+            "id": 1,
+            "name": "John Doe",
+            "email": "john.doe@example.com",
+            "phone_num": "1234567890",
+            "location": "New York, USA",
+            "industry": "Technology",
+            "password": "SecureP@ssw0rd",
+            "logo": "logo.jpg",
+            "logo_type": "image/webp",
+            "isVerified": "false",
+            "status": 1
+          }
+         }
+         ```
+       - **Error** (`400 Bad Request`)
+         ```bash
+         {
+           "success": false,
+           "message": "Internal server error"
+         }
+         ```
+
+2. Login:
+
+   - User
+     - **Endpoint:**
+       `POST /api/auth/user/login`
+     - **Headers:**
+       `Content-Type: application/json`
+     - **Request Body:**
+       ```bash
+       {
+        "email": "john.doe@example.com",
+        "password": "SecureP@ssw0rd",
+       }
+       ```
+     - **Response:**
+       - **Success**(`200 OK`):
+         ```bash
+         {
+          "message": "User created successfully",
+          "user": {
+            "date": "2024-11-23T16:31:12.125Z",
+            "id": 1,
+            "full_name": "John Doe",
+            "email": "john.doe@example.com",
+            "phone_num": "1234567890",
+            "location": "New York",
+            "gender": "Male",
+            "cv": "john_doe_cv.pdf",
+            "cv_type": "application/pdf",
+            "profile_pic": "profile_pic.jpg",
+            "profile_pic_type": "image/webp",
+            "isVerified": "false",
+            "status": 1
+          }
+         }
+         ```
+       - **Error** (`400 Bad Request`)
+         ```bash
+         {
+           "success": false,
+           "message": "Internal server error"
+         }
+         ```
+   - Compan
+     - **Endpoint:**
+       `POST /api/auth/company/login`
+     - **Headers:**
+       `Content-Type: application/json`
+     - **Request Body:**
+       ```bash
+       {
+        "email": "john.doe@example.com",
+        "password": "SecureP@ssw0rd",
        }
        ```
      - **Response:**
@@ -201,9 +287,6 @@
          }
          ```
 
-2. Login:
-   - User
-   - Company
 3. Account Verification:
    - User
    - Company
