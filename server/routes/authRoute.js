@@ -4,6 +4,8 @@ import {
   loginUser,
   registerCompany,
   registerUser,
+  verifyCompany,
+  verifyUser,
 } from "../controllers/authController.js";
 import { uploadLogo, uploadPPCV } from "../controllers/uploadController.js";
 import { userValidation } from "../validation/userValidation.js";
@@ -23,5 +25,11 @@ router.post("/user/login", loginValidation, loginUser);
 
 // Login a company
 router.post("/company/login", loginValidation, companyLogin);
+
+// Verify a user's account
+router.put("/user/verify/", verifyUser);
+
+// Verify a company's account
+router.put("/company/verify/", verifyCompany);
 
 export default router;

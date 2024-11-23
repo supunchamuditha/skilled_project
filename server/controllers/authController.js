@@ -1,7 +1,7 @@
 import { where } from "sequelize";
 import { validationResult } from "express-validator";
 
-import {User, Company} from "../models/index.js";
+import { User, Company } from "../models/index.js";
 // import Company from "../models/Company.js";
 import { hashPassword, comparePassword } from "../utils/hashPassword.js";
 import generateToken from "../utils/generateToken.js";
@@ -300,6 +300,60 @@ export const companyLogin = async (req, res) => {
 
     // Return the company object
     return res.status(200).json({ message, company: companyResponse });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Verify a user account
+export const verifyUser = async (req, res) => {
+  try {
+    // Extract email and OTP from request body
+    const { email, otp } = req.body;
+
+    // Check if the OTP is valid
+    if (!otpStore[email] || otpStore[email].otp !== otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    // Check if the OTP has expired
+    if (Date.now() > otpStore[email].expiresAt) {
+      return res.status(400).json({ message: "OTP has expired" });
+    }
+
+    // Update the user's account verification status
+    await User.update({ isVerified: "true" }, { where: { email } });
+
+    // Return a success message
+    return res.status(200).json({ message: "Account verified successfully" });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Verify a company account
+export const verifyCompany = async (req, res) => {
+  try {
+    // Extract email and OTP from request body
+    const { email, otp } = req.body;
+
+    // Check if the OTP is valid
+    if (!otpStore[email] || otpStore[email].otp !== otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    // Check if the OTP has expired
+    if (Date.now() > otpStore[email].expiresAt) {
+      return res.status(400).json({ message: "OTP has expired" });
+    }
+
+    // Update the company's account verification status
+    await Company.update({ isVerified: "true" }, { where: { email } });
+
+    // Return a success message
+    return res.status(200).json({ message: "Account verified successfully" });
   } catch (error) {
     console.error(error.message);
     return res.status(500).json({ message: "Internal server error" });
