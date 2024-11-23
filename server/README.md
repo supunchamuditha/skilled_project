@@ -129,22 +129,22 @@
        - **Success**(`200 OK`):
          ```bash
          {
-             "message": "Company created successfully",
-             "company": {
-                 "date": "2024-11-23T16:31:12.125Z",
-                 "id": 1,
-                 "full_name": "John Doe",
-                 "email": "john.doe@example.com",
-                 "phone_num": "1234567890",
-                 "location": "New York",
-                 "gender": "Male",
-                 "cv": "john_doe_cv.pdf",
-                 "cv_type": "application/pdf",
-                 "profile_pic": "profile_pic.jpg",
-                 "profile_pic_type": "image/webp",
-                 "isVerified": "false",
-                 "status": 1
-             }
+          "message": "User created successfully",
+          "user": {
+            "date": "2024-11-23T16:31:12.125Z",
+            "id": 1,
+            "full_name": "John Doe",
+            "email": "john.doe@example.com",
+            "phone_num": "1234567890",
+            "location": "New York",
+            "gender": "Male",
+            "cv": "john_doe_cv.pdf",
+            "cv_type": "application/pdf",
+            "profile_pic": "profile_pic.jpg",
+            "profile_pic_type": "image/webp",
+            "isVerified": "false",
+            "status": 1
+          }
          }
          ```
        - **Error** (`400 Bad Request`)
@@ -155,7 +155,6 @@
          }
          ```
    - Company
-
      - **Endpoint:**
        `POST /api/auth/company`
      - **Headers:**
@@ -172,14 +171,9 @@
         "password": "SecureP@ssw0rd",
         "logo": "logo.jpg"
        }
-
-
        ```
-
      - **Response:**
-
        - **Success**(`200 OK`):
-
          ```bash
          {
           "message": "Company created successfully",
@@ -199,7 +193,6 @@
           }
          }
          ```
-
        - **Error** (`400 Bad Request`)
          ```bash
          {
