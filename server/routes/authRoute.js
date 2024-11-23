@@ -4,6 +4,8 @@ import {
   loginUser,
   registerCompany,
   registerUser,
+  resendCompanyOTP,
+  resendUserOTP,
   verifyCompany,
   verifyUser,
 } from "../controllers/authController.js";
@@ -33,6 +35,9 @@ router.put("/user/verify/", verifyUser);
 router.put("/company/verify/", verifyCompany);
 
 // Resend verification email
-router.post("/user/verify/resend", verifyUser);
+router.post("/user/verify/resend", resendUserOTP);
+
+// Resend verification email
+router.post("/company/verify/resend", resendCompanyOTP);
 
 export default router;
