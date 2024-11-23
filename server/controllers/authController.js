@@ -359,3 +359,83 @@ export const verifyCompany = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+// Resend OTP to a user
+export const resendUserOTP = async (req, res) => {
+  try {
+    // Extract email from request body
+    const { email } = req.body;
+
+    // Check if the user exists
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Generate OTP
+    const otp = generateOTP();
+
+    // Store the OTP in memory
+    otpStore[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 };
+
+    // Send OTP SMS to the user
+    await sendOTP(user.phone_num, otp);
+
+    // Send OTP email to the user
+    sendVerificationEmail(email, otp);
+
+    // Return a success message
+    return res.status(200).json({ message: "OTP sent successfully" });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Resend OTP to a company
+export const resendCompanyOTP = async (req, res) => {
+  try {
+    // Extract email from request body
+    const { email } = req.body;
+
+    // Check if the company exists
+    const company = await Company.findOne({ where: { email } });
+    if (!company) {
+      return res.status(404).json({ message: "Company not found" });
+    }
+
+    // Generate OTP
+    const otp = generateOTP();
+
+    // Store the OTP in memory
+    otpStore[email] = { otp, expiresAt: Date.now() + 5 * 60 * 1000 };
+
+    // Send OTP SMS to the company
+    await sendOTP(company.phone_num, otp);
+
+    // Send OTP email to the company
+    sendVerificationEmail(email, otp);
+
+    // Return a success message
+    return res.status(200).json({ message: "OTP sent successfully" });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Logout a user or company
+export const logout = async (req, res) => {
+  try {
+    // Clear the token cookie
+    res.clearCookie("token");
+
+    // Return a success message
+    return res
+      .status(200)
+      .json({ message: "User or company logged out successfully" });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};

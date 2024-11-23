@@ -2,8 +2,11 @@ import express from "express";
 import {
   companyLogin,
   loginUser,
+  logout,
   registerCompany,
   registerUser,
+  resendCompanyOTP,
+  resendUserOTP,
   verifyCompany,
   verifyUser,
 } from "../controllers/authController.js";
@@ -31,5 +34,17 @@ router.put("/user/verify/", verifyUser);
 
 // Verify a company's account
 router.put("/company/verify/", verifyCompany);
+
+// Resend verification email
+router.post("/user/verify/resend", resendUserOTP);
+
+// Resend verification email
+router.post("/company/verify/resend", resendCompanyOTP);
+
+// Logout a user
+router.post("/user/logout", logout);
+
+// Logout a company
+router.post("/company/logout", logout);
 
 export default router;
