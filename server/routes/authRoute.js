@@ -3,7 +3,6 @@ import {
   companyLogin,
   loginUser,
   logout,
-  logoutUser,
   registerCompany,
   registerUser,
   resendCompanyOTP,
