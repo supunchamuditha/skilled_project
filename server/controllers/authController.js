@@ -423,3 +423,19 @@ export const resendCompanyOTP = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+// Logout a user or company
+export const logout = async (req, res) => {
+  try {
+    // Clear the token cookie
+    res.clearCookie("token");
+
+    // Return a success message
+    return res
+      .status(200)
+      .json({ message: "User or company logged out successfully" });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};

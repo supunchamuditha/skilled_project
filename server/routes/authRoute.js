@@ -2,6 +2,8 @@ import express from "express";
 import {
   companyLogin,
   loginUser,
+  logout,
+  logoutUser,
   registerCompany,
   registerUser,
   resendCompanyOTP,
@@ -39,5 +41,11 @@ router.post("/user/verify/resend", resendUserOTP);
 
 // Resend verification email
 router.post("/company/verify/resend", resendCompanyOTP);
+
+// Logout a user
+router.post("/user/logout", logout);
+
+// Logout a company
+router.post("/company/logout", logout);
 
 export default router;
