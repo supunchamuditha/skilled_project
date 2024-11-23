@@ -32,4 +32,7 @@ router.put("/user/verify/", verifyUser);
 // Verify a company's account
 router.put("/company/verify/", verifyCompany);
 
+// Resend verification email
+router.post("/user/verify/resend", verifyUser);
+
 export default router;
